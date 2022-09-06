@@ -6,6 +6,8 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <WiFi.h>
+#include<esp_now.h>
+
 
 //Screen Setup
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
@@ -19,14 +21,43 @@ const int button_pin = 23;
 const int led_pin = 18;
 bool buttonstate = 0;
 
+//Data Structure
+typedef struct struct_message {
+  int a;
+  bool b;
+} struct_message;
 
+struct_message myData;
+
+void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {  
+  memcpy(&myData, incomingData, sizeof(myData));
+  
+  Serial.print("Data Recieved ");
+  Serial.print(myData.a);
+  Serial.print("     ");
+  Serial.println(myData.b);
+  
+  if(myData.b == 1){
+    digitalWrite(led_pin, HIGH);
+  } else  {
+    digitalWrite(led_pin, LOW);
+  }
+}
 
 void setup() {
   pinMode(button_pin, INPUT);
   pinMode(led_pin, OUTPUT);
   WiFi.mode(WIFI_MODE_STA);
+  Serial.begin(115200);
 
   initScreen();
+  
+  if  (esp_now_init() != ESP_OK)  {
+    Serial.println("Error initializing ESP-NOW");
+    return;
+  }
+  
+  esp_now_register_recv_cb(OnDataRecv);
 }
 
 void loop() {

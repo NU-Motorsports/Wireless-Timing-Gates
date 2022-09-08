@@ -16,18 +16,23 @@
 #define SCREEN_ADDRESS 0x3C
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
-//Misc Setup
+//Inupt Pins
 const int button_pin = 23;
 const int led_pin = 18;
-bool buttonstate = 0;
+const int sync_pin = 15;
 
-//Data Structure
+bool buttonstate = 0;
+bool syncstate = 0;
+
+//Message Structure
 typedef struct struct_message {
   int a;
   bool b;
 } struct_message;
 
 struct_message myData;
+
+//Sync Structure
 
 void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {  
   memcpy(&myData, incomingData, sizeof(myData));

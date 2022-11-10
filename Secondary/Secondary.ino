@@ -16,10 +16,11 @@
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 //Input Pins
-const int button_pin = 23;
+const int gate_pin = 23;
+const int speed_pin = 2;
 const int led_pin = 18;
 const int advance_pin = 19;
-bool buttonstate = 0;
+bool gatestate = 0;
 bool gateadvance = 0;
 int gatenum = 0;
 bool ledstate = 0;
@@ -27,8 +28,9 @@ uint8_t broadcastAddress[] = {0x78, 0x21, 0x84, 0x7F, 0xFC, 0x84};
 
 //Data Structure
 typedef struct struct_message {
-  int a;
-  bool b;
+  int a;                            //Gate Number (0-9)
+  bool b;                           //Gate Status (tripped (1) vs not tripped (0))
+  float c;                          //Speed trap (in mph) if speed is less than 5mph will return 0mph
 } struct_message;
 
 //Structured Object
@@ -41,7 +43,7 @@ esp_now_peer_info_t peerInfo;
 
 void setup() {
   //Initial Setup
-  pinMode(button_pin, INPUT);
+  pinMode(gate_pin, INPUT);
   pinMode(led_pin, OUTPUT);
   WiFi.mode(WIFI_MODE_STA);
   Serial.begin(115200);
@@ -69,15 +71,31 @@ void setup() {
 
 
 void loop() {
-  buttonstate = digitalRead(button_pin);
+  gatestate = digitalRead(gate_pin);
   gateadvance = digitalRead(advance_pin);
 
-  if (buttonstate == HIGH)  {
+  float speed_value = 0;
+  unsigned long speed_time = 0;
+
+  myData.a = gatenum;
+  myData.c = 0;
+
+  if (gatestate == HIGH)  {                       //First Gate Triggered
     digitalWrite(led_pin,HIGH);
+    myData.b = 1;
+    speed_time = millis();
     
-  } else  {
+    
+    for (float i=2.1364;i<=millis() - speed_time;0)  {         //Set Min Recorded Speed (time)
+      if (digitalRead(speed_pin) == HIGH) {
+        speed_time = millis() - speed_time;         //Find Time Differential
+        speed_value = speed_time;//17.6/speed_time;       //Calculate Speed in MPH
+        myData.c = speed_value;
+      }
+    }
+  } else  {                                       //Leave LED low and keep moving the rest of the time
     digitalWrite(led_pin, LOW);
-    
+    myData.b = 0;
   }
 
   if(gateadvance==HIGH && gatenum<9) {
@@ -89,13 +107,14 @@ void loop() {
   }
 
   myData.a = gatenum;
-  myData.b = buttonstate;
   esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &myData, sizeof(myData));
   if(result == ESP_OK) {
     Serial.print("Sending Confirmed:    ");
     Serial.print(myData.a);
     Serial.print("    ");
-    Serial.println(myData.b);
+    Serial.print(myData.b);
+    Serial.print("    ");
+    Serial.println(myData.c);
   } else  {
     Serial.println("Sending Error");
   }

@@ -1,5 +1,6 @@
 //Made by DJ Walsh in Fall 2022
 //This is the gate-side code for an ESP-32 based Wireless Timing Gate System
+//My code is my documentation
 
 //Libraries
 #include <Wire.h>
@@ -19,15 +20,14 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 //Inupt Pins
 const int button_pin = 23;
 const int led_pin = 18;
-const int sync_pin = 15;
 
 bool buttonstate = 0;
-bool syncstate = 0;
 
 //Message Structure
 typedef struct struct_message {
   int a;
   bool b;
+  float c;
 } struct_message;
 
 struct_message myData;
@@ -37,10 +37,11 @@ struct_message myData;
 void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {  
   memcpy(&myData, incomingData, sizeof(myData));
   
-  Serial.print("Data Recieved ");
-  Serial.print(myData.a);
+  Serial.print(myData.a);     //Gate Number
   Serial.print("     ");
-  Serial.println(myData.b);
+  Serial.print(myData.b);     //Triggered?
+  Serial.print("     ");
+  Serial.println(myData.c);   //Speed (mph, will return 5 if less than 5mph
   
   if(myData.b == 1){
     digitalWrite(led_pin, HIGH);
@@ -85,8 +86,8 @@ void initScreen(){
   display.setTextColor(SSD1306_WHITE);
   display.setCursor(25,0);
   display.println(F("NU Motorsports"));
-  display.setCursor(6,18);
-  display.println(F("Timing Gate Primary"));
+  display.setCursor(9,9);
+  display.println(F("Vehicle Time Module"));
   display.setCursor(13,45);
   display.println(WiFi.macAddress());
   display.display();

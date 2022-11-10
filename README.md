@@ -22,4 +22,4 @@ All gates are capable of running with or without a speed detector
 
 ## Speed Detection Setup
 
-If running gates without speed detection, only connect a gate to the Gate 1 connector. If speed detection is desired, simply add a second gate to the Gate 2 connector and place the leading edge of each gate 6 inches apart. For accurate results the gates should be hit dead on, not during a turn. 
+If running gates without speed detection, only connect a gate to the Gate 1 connector. If speed detection is desired, simply add a second gate to the Gate 2 connector and place the leading edge of each gate 12 inches apart. For accurate results the gates should be hit dead on, not during a turn. 

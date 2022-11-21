@@ -1,5 +1,5 @@
 //Made by DJ Walsh in Fall 2022
-//This is the gate-side code for an ESP-32 based Wireless Timing Gate System
+//This is the car-side code for an ESP-32 based Wireless Timing Gate System
 //My code is my documentation
 
 //Libraries

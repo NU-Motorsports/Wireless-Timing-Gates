@@ -1,4 +1,4 @@
-const int button_pin = 11;
+const int button_pin = 10;
 const int led_pin = 13;
 bool gatestate = 0;
 float timervar = 0;

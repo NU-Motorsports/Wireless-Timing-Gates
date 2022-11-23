@@ -20,17 +20,20 @@ const int gate_pin = 23;
 const int speed_pin = 2;
 const int led_pin = 18;
 const int advance_pin = 19;
+
+//Global Variables
 bool gatestate = 0;
 bool gateadvance = 0;
 int gatenum = 0;
 bool ledstate = 0;
 uint8_t broadcastAddress[] = {0x78, 0x21, 0x84, 0x7F, 0xFC, 0x84};
 
+
 //Data Structure
 typedef struct struct_message {
   int a;                            //Gate Number (0-9)
   bool b;                           //Gate Status (tripped (1) vs not tripped (0))
-  float c;                          //Speed trap (in mph) if speed is less than 5mph will return 0mph
+  float c;                          //Speed trap time (in ms) if speed is less than 1mph will return 0 seconds
 } struct_message;
 
 //Structured Object
@@ -71,28 +74,20 @@ void setup() {
 
 
 void loop() {
+  //Read Inputs
   gatestate = digitalRead(gate_pin);
   gateadvance = digitalRead(advance_pin);
 
-  float speed_value = 0;
-  unsigned long speed_time = 0;
+  
 
   myData.a = gatenum;
   myData.c = 0;
 
-  if (gatestate == HIGH)  {                       //First Gate Triggered
+  if (gatestate == HIGH)  {                       //Gate Triggered
     digitalWrite(led_pin,HIGH);
     myData.b = 1;
-    speed_time = millis();
+    measureSpeedTime();
     
-    
-    for (float i=2.1364;i<=millis() - speed_time;0)  {         //Set Min Recorded Speed (time)
-      if (digitalRead(speed_pin) == HIGH) {
-        speed_time = millis() - speed_time;         //Find Time Differential
-        speed_value = speed_time;//17.6/speed_time;       //Calculate Speed in MPH
-        myData.c = speed_value;
-      }
-    }
   } else  {                                       //Leave LED low and keep moving the rest of the time
     digitalWrite(led_pin, LOW);
     myData.b = 0;
@@ -121,6 +116,9 @@ void loop() {
   delay(100);
 
   }
+
+
+
 
 
 
@@ -158,4 +156,16 @@ void initScreen(){
   }
   
   updateDisplay();
+}
+
+void measureSpeedTime() {
+  unsigned long speed_time = millis();
+  
+  for (float i=5;i<=millis()-speed_time;0)  {         //Set Min Recorded Speed (time)
+    if (digitalRead(speed_pin) == HIGH) {
+      speed_time = millis() - speed_time;         //Find Time Differential
+        speed_value = speed_time;//17.6/speed_time;       //Calculate Speed in MPH
+        myData.c = speed_value;
+      }
+    }
 }

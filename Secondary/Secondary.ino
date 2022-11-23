@@ -83,7 +83,9 @@ void loop() {
   myData.a = gatenum;
   myData.c = 0;
 
-  if (gatestate == HIGH)  {                       //Gate Triggered
+  
+  //Gate Triggered
+  if (gatestate == HIGH)  {
     digitalWrite(led_pin,HIGH);
     myData.b = 1;
     measureSpeedTime();
@@ -93,6 +95,8 @@ void loop() {
     myData.b = 0;
   }
 
+
+  //Gate Number Advance Button
   if(gateadvance==HIGH && gatenum<9) {
     gatenum = gatenum+1;
     updateDisplay();

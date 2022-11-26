@@ -17,7 +17,6 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 //Input Pins
 const int gate_pin = 23;
-const int speed_pin = 2;
 const int led_pin = 18;
 const int advance_pin = 19;
 
@@ -50,24 +49,28 @@ void setup() {
   pinMode(led_pin, OUTPUT);
   WiFi.mode(WIFI_MODE_STA);
   Serial.begin(115200);
-
+  
+  
   //ESP-NOW Setup
   if (esp_now_init() != ESP_OK) {
     Serial.println("Error initializing Esp-Now");
   }
   esp_now_register_send_cb(OnDataSent);
+  
 
   //Register Peer
   memcpy(peerInfo.peer_addr, broadcastAddress, 6);
   peerInfo.channel = 0;
   peerInfo.encrypt - false;
+  
 
   //Add Peer
   if (esp_now_add_peer(&peerInfo) != ESP_OK){
     Serial.println("Failed to add peer");
     return;
   }
-
+  
+  //Screen Initialization
   initScreen();
 }
 
@@ -77,12 +80,12 @@ void loop() {
   //Read Inputs
   gatestate = digitalRead(gate_pin);
   gateadvance = digitalRead(advance_pin);
-
   
-
+  
+  //Reset Data
   myData.a = gatenum;
   myData.c = 0;
-
+  
   
   //Gate Triggered
   if (gatestate == HIGH)  {
@@ -90,12 +93,26 @@ void loop() {
     myData.b = 1;
     measureSpeedTime();
     
-  } else  {                                       //Leave LED low and keep moving the rest of the time
-    digitalWrite(led_pin, LOW);
-    myData.b = 0;
+    esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &myData, sizeof(myData));
+    if(result == ESP_OK) {
+      Serial.print("Sending Confirmed:    ");
+      Serial.print(myData.a);
+      Serial.print("    ");
+      Serial.print(myData.b);
+      Serial.print("    ");
+      Serial.println(myData.c);
+    } else  {
+      Serial.println("Sending Error");
+    }
+    delay(100);
+    
   }
-
-
+  digitalWrite(led_pin, LOW);
+  myData.b = 0;
+  
+  
+  
+  
   //Gate Number Advance Button
   if(gateadvance==HIGH && gatenum<9) {
     gatenum = gatenum+1;
@@ -104,19 +121,8 @@ void loop() {
     gatenum = 0;
     updateDisplay();
   }
-
-  myData.a = gatenum;
-  esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &myData, sizeof(myData));
-  if(result == ESP_OK) {
-    Serial.print("Sending Confirmed:    ");
-    Serial.print(myData.a);
-    Serial.print("    ");
-    Serial.print(myData.b);
-    Serial.print("    ");
-    Serial.println(myData.c);
-  } else  {
-    Serial.println("Sending Error");
-  }
+  
+  
   delay(100);
 
   }
@@ -166,10 +172,9 @@ void measureSpeedTime() {
   unsigned long speed_time = millis();
   
   for (float i=5;i<=millis()-speed_time;0)  {         //Set Min Recorded Speed (time)
-    if (digitalRead(speed_pin) == HIGH) {
+    if (digitalRead(gate_pin) == HIGH) {
       speed_time = millis() - speed_time;         //Find Time Differential
-        speed_value = speed_time;//17.6/speed_time;       //Calculate Speed in MPH
-        myData.c = speed_value;
-      }
+      myData.c = speed_time;
+    }
     }
 }

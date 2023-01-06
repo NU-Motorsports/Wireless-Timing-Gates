@@ -8,17 +8,20 @@
 #include <WiFi.h>
 #include <esp_now.h>
 
+
 //Screen Setup
 #define SCREEN_WIDTH 128 // OLED display width, in pixels
 #define SCREEN_HEIGHT 64 // OLED display height, in pixels
-#define OLED_RESET     -1 // Reset pin # (or -1 if sharing Arduino reset pin)
+#define OLED_RESET    -1 // Reset pin # (or -1 if sharing Arduino reset pin)
 #define SCREEN_ADDRESS 0x3C
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
+
 
 //Input Pins
 const int gate_pin = 23;
 const int led_pin = 18;
 const int advance_pin = 19;
+
 
 //Global Variables
 bool gatestate = 0;
@@ -35,8 +38,10 @@ typedef struct struct_message {
   float c;                          //Speed trap time (in ms) if speed is less than 1mph will return 0 seconds
 } struct_message;
 
+
 //Structured Object
 struct_message myData;
+
 
 //Peer Info
 esp_now_peer_info_t peerInfo;
@@ -56,19 +61,16 @@ void setup() {
     Serial.println("Error initializing Esp-Now");
   }
   esp_now_register_send_cb(OnDataSent);
-  
-
   //Register Peer
   memcpy(peerInfo.peer_addr, broadcastAddress, 6);
   peerInfo.channel = 0;
   peerInfo.encrypt - false;
-  
-
   //Add Peer
   if (esp_now_add_peer(&peerInfo) != ESP_OK){
     Serial.println("Failed to add peer");
     return;
   }
+
   
   //Screen Initialization
   initScreen();
@@ -77,15 +79,8 @@ void setup() {
 
 
 void loop() {
-  //Read Inputs
-  gatestate = digitalRead(gate_pin);
-  gateadvance = digitalRead(advance_pin);
-  
-  
-  //Reset Data
-  myData.a = gatenum;
-  myData.c = 0;
-  
+  inputread();
+  datareset();
   
   //Gate Triggered
   if (gatestate == HIGH)  {
@@ -157,6 +152,7 @@ void updateDisplay(){
   delay(500);
 }
 
+
 //Screen Initialization
 void initScreen(){
   
@@ -168,6 +164,21 @@ void initScreen(){
   updateDisplay();
 }
 
+
+//Read Inputs
+void inputread(){
+  gatestate = digitalRead(gate_pin);
+  gateadvance = digitalRead(advance_pin);
+}
+
+
+//Reset Data
+void datareset(){
+  myData.a = gatenum;
+  myData.c = 0;
+}
+
+//Speed Measurement Time
 void measureSpeedTime() {
   unsigned long speed_time = millis();
   

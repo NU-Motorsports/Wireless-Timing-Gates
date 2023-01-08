@@ -9,6 +9,7 @@ int debounceDelay = 2000; //in microseconds
 float stopwatch = 0;
 bool wheelnum = 0;
 int lastDebounceTime = 0;
+bool gateReading = 0;
 
 
 void setup() {
@@ -21,7 +22,7 @@ void setup() {
 }
 
 void loop() {
-  bool gateReading = digitalRead(button_pin);
+  gateReading = digitalRead(button_pin);
 //  Serial.print(esp_timer_get_time());
 //  Serial.print("   ");
 //  Serial.print(esp_timer_get_time()-lastDebounceTime);

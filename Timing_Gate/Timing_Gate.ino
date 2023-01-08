@@ -20,7 +20,7 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 
 //Input Pins
-const int gate_pin = 23;
+const int gate_pin = 2;
 const int mode_pin = 19;
 const int select_pin = 27;
 const int indicator_pin = 18;
@@ -78,7 +78,7 @@ void setup() {
   //Initial Setup
   pinMode(gate_pin, INPUT);
   pinMode(mode_pin,INPUT);
-  pinMode(select_pin,INPUT)
+  pinMode(select_pin,INPUT);
   pinMode(error_pin,OUTPUT);
   pinMode(indicator_pin, OUTPUT);
 
@@ -135,13 +135,15 @@ void loop() {
           stopwatch = esp_timer_get_time() - timervar;
           myData.d = 1;
           senddata();
+          wheelnum =0;
         }
-      }else if((esp_timer_get_time() - timervar)>3000000){
+      }
+    }else if(((esp_timer_get_time() - timervar)>3000000) && (wheelnum == 1)){
         stopwatch = esp_timer_get_time() - timervar;
         myData.d = 0;
         senddata();
+        wheelnum = 0;
       }
-    }
   }
   
   
@@ -150,7 +152,7 @@ void loop() {
     lastButtonDebounceTime = esp_timer_get_time();
   }
   
-  if((esp_timer_get_time()-lastButtonDebounceTime>buttonDebounceDelay){
+  if((esp_timer_get_time()-lastButtonDebounceTime)>buttonDebounceDelay){
     if(modeReading != modeState){
       modeState = modeReading;
     }
@@ -158,10 +160,10 @@ void loop() {
   
   
   //Gate Number Advance Button
-  if(gateadvance==HIGH && gatenum<9) {
+  if(selectState==HIGH && gatenum<9) {
     gatenum = gatenum+1;
     updateDisplay();
-  } else if(gateadvance==HIGH){
+  } else if(selectState==HIGH){
     gatenum = 0;
     updateDisplay();
   }
@@ -257,34 +259,38 @@ void inputread(){
 }
 
 
-//Mode Button Debounce
-void modeDebounce(){
-  if(modeReading !=lastModeState){                                //Detect Start of Press
-    lastButtonDebounceTime = esp_timer_get_time();
-  }
-
-  if((esp_timer_get_time()-lastDebounceTime)>debounceDelay){      //Continue if press remains longer than the debounce delay
-    if(gateReading != gateState){                                 //Prevents looping for gate held down longer than 1 loop
-      gateState = gateReading;
-      if(gateState == HIGH){                                      //When gate triggered
-        if(wheelnum == 0){
-          timervar = esp_timer_get_time();                        //Record first press time
-          digitalWrite(indicator_pin,HIGH);
-          myData.b = 1;
-          wheelnum = 1;
-        }else if(wheelnum == 1){                                  //Record second gate hitting
-          stopwatch = esp_timer_get_time() - timervar;
-          myData.d = 1;
-          senddata();
-        }
-      }else if((esp_timer_get_time() - timervar)>3000000){
-        stopwatch = esp_timer_get_time() - timervar;
-        myData.d = 0;
-        senddata();
-      }
-    }
-  }
-}
+////Mode Button Debounce
+//void modeDebounce(){
+//  if(modeReading !=lastModeState){                                //Detect Start of Press
+//    lastButtonDebounceTime = esp_timer_get_time();
+//  }
+//
+//  if((esp_timer_get_time()-lastDebounceTime)>debounceDelay){      //Continue if press remains longer than the debounce delay
+//    if(gateReading != gateState){                                 //Prevents looping for gate held down longer than 1 loop
+//      gateState = gateReading;
+//      if(gateState == HIGH){                                      //When gate triggered
+//        if(wheelnum == 0){
+//          timervar = esp_timer_get_time();                        //Record first press time
+//          digitalWrite(indicator_pin,HIGH);
+//          myData.b = 1;
+//          wheelnum = 1;
+//        }else if(wheelnum == 1){                                  //Record second gate hitting
+//          stopwatch = esp_timer_get_time() - timervar;
+//          myData.d = 1;
+//          senddata();
+//          wheelnum = 0;
+//        }
+//      }
+//    }else if(((esp_timer_get_time() - timervar)>3000000) && (wheelnum == 1) && (gateState == HIGH)){
+//      stopwatch = esp_timer_get_time() - timervar;
+//      myData.d = 0;
+//      myData.c = stopwatch;
+//      wheelnum = 0;
+//      senddata();
+//      
+//    }
+//  }
+//}
 
 
 //Select Button Debounce

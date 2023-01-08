@@ -27,7 +27,8 @@ bool buttonstate = 0;
 typedef struct struct_message {
   int a;
   bool b;
-  float c;
+  int c;
+  bool d;
 } struct_message;
 
 struct_message myData;
@@ -41,7 +42,9 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
   Serial.print("     ");
   Serial.print(myData.b);     //Triggered?
   Serial.print("     ");
-  Serial.println(myData.c);   //Speed (mph, will return 5 if less than 5mph
+  Serial.print(myData.c);   //Speed (mph, will return 5 if less than 5mph
+  Serial.print("     ");
+  Serial.println(myData.d);   //Speed (mph, will return 5 if less than 5mph
   
   if(myData.b == 1){
     digitalWrite(led_pin, HIGH);
@@ -54,7 +57,7 @@ void setup() {
   pinMode(button_pin, INPUT);
   pinMode(led_pin, OUTPUT);
   WiFi.mode(WIFI_MODE_STA);
-  Serial.begin(115200);
+  Serial.begin(9600);
 
   initScreen();
   

@@ -21,7 +21,10 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 const int button_pin = 23;
 const int led_pin = 18;
 
+//Speed Calc Variables
+float wheelbase = 
 bool buttonstate = 0;
+
 
 //Message Structure
 typedef struct struct_message {
@@ -89,9 +92,7 @@ void initScreen(){
   display.setTextColor(SSD1306_WHITE);
   display.setCursor(25,0);
   display.println(F("NU Motorsports"));
-  display.setCursor(9,9);
-  display.println(F("Vehicle Time Module"));
-  display.setCursor(13,45);
+  display.setCursor(13,9);
   display.println(WiFi.macAddress());
   display.display();
   delay(2000);

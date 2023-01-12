@@ -19,10 +19,10 @@
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 
-//Input Pins
+//I/O Pins
 const int gate_pin = 2;
-const int mode_pin = 19;
-const int select_pin = 27;
+const int mode_pin = 23;
+const int select_pin = 19;
 const int indicator_pin = 18;
 const int error_pin = 4;
 
@@ -42,7 +42,7 @@ bool gateState = 0;
 bool lastGateState = 0;
 
 //Button Debounce Varbiables
-int buttonDebounceDelay = 4000;     //in microseconds
+int buttonDebounceDelay = 8000;     //in microseconds
 int lastButtonDebounceTime = 0;
 bool modeReading = 0;
 bool selectReading = 0;
@@ -56,6 +56,7 @@ uint8_t broadcastAddress[] = {0x78, 0x21, 0x84, 0x7F, 0xFC, 0x84};
 
 //Mode Variables
 int modeStatus = 0;   //0:Gate Number 1:Speed Display 2:Broadcast Address 3:Lock 4:Speed Measurement type?
+int num_modes = 3;
 
 
 //Data Structure
@@ -148,25 +149,40 @@ void loop() {
   
   
   //Mode Triggered
-  if(modeReading != lastGateState){
+  if(modeReading != lastModeState){
     lastButtonDebounceTime = esp_timer_get_time();
   }
   
   if((esp_timer_get_time()-lastButtonDebounceTime)>buttonDebounceDelay){
     if(modeReading != modeState){
       modeState = modeReading;
+      if(modeState == HIGH && modeStatus<num_modes){
+        modeStatus = modeStatus+1;
+        updateDisplay();
+      }else if(modeState == HIGH){
+        modeStatus = 0;
+        updateDisplay();
+      }
+    }
+  }
+
+
+  //Select Triggered
+  if(selectReading != lastSelectState){
+    lastButtonDebounceTime = esp_timer_get_time();
+    if(selectReading != selectState){
+      if(modeState == 0){
+        if(gatenum<9){
+          gatenum = gatenum+1;
+          updateDisplay();
+        }else{
+          gatenum = 0;
+          updateDisplay();
+        }
+      }
     }
   }
   
-  
-  //Gate Number Advance Button
-  if(selectState==HIGH && gatenum<9) {
-    gatenum = gatenum+1;
-    updateDisplay();
-  } else if(selectState==HIGH){
-    gatenum = 0;
-    updateDisplay();
-  }
 
   lastModeState = modeReading;
   lastSelectState = selectReading;
@@ -193,49 +209,49 @@ void updateDisplay(){
   display.clearDisplay();
   display.setTextSize(1);
   display.setTextColor(SSD1306_WHITE);
-  display.setCursor(25,0);
-  display.println("NU Motorsports");
-  display.setCursor(0,18);
-  display.print("Timing Gate ");
-  display.print(gatenum);
-  display.setCursor(13,45);
-  display.println(WiFi.macAddress());
+  if(modeStatus == 0){
+    updateDisplay_Gate();
+  }else if(modeStatus == 1){
+    updateDisplay_Address();
+  }else if(modeStatus == 2){
+    updateDisplay_Lock();
+  }else{
+    display.setCursor(25,0);
+    display.println("NU Motorsports");
+    display.setCursor(0,18);
+    display.print("Empty Mode Screen");
+  }
   display.display();
-  delay(500);
 }
 
 
 //Screen Update Gate Num
 void updateDisplay_Gate(){
-  display.clearDisplay();
-  display.setTextSize(1);
-  display.setTextColor(SSD1306_WHITE);
   display.setCursor(25,0);
   display.println("NU Motorsports");
   display.setCursor(0,18);
   display.print("Timing Gate ");
   display.print(gatenum);
-  display.display();
 }
 
 
 //Screen Update Broadcast Address
 void updateDisplay_Address(){
-  display.clearDisplay();
-  display.setTextSize(1);
-  display.setTextColor(SSD1306_WHITE);
   display.setCursor(25,0);
   display.println("NU Motorsports");
   display.setCursor(13,18);
   display.println(WiFi.macAddress());
-  display.display();
 }
 
 
 //Screen Update Lock
+void updateDisplay_Lock(){
+  display.setCursor(25,0);
+  display.println("NU Motorsports");
+  display.setCursor(30,18);
+  display.println("Lock?");
+}
 
-
-//Screen Update Gate Type
 
 
 //Screen Initialization
@@ -247,7 +263,7 @@ void initScreen(){
     //for(;;); // Don't proceed, loop forever
   }
   
-  updateDisplay_Gate();
+  updateDisplay();
 }
 
 
@@ -258,42 +274,6 @@ void inputread(){
   selectReading = digitalRead(select_pin);
 }
 
-
-////Mode Button Debounce
-//void modeDebounce(){
-//  if(modeReading !=lastModeState){                                //Detect Start of Press
-//    lastButtonDebounceTime = esp_timer_get_time();
-//  }
-//
-//  if((esp_timer_get_time()-lastDebounceTime)>debounceDelay){      //Continue if press remains longer than the debounce delay
-//    if(gateReading != gateState){                                 //Prevents looping for gate held down longer than 1 loop
-//      gateState = gateReading;
-//      if(gateState == HIGH){                                      //When gate triggered
-//        if(wheelnum == 0){
-//          timervar = esp_timer_get_time();                        //Record first press time
-//          digitalWrite(indicator_pin,HIGH);
-//          myData.b = 1;
-//          wheelnum = 1;
-//        }else if(wheelnum == 1){                                  //Record second gate hitting
-//          stopwatch = esp_timer_get_time() - timervar;
-//          myData.d = 1;
-//          senddata();
-//          wheelnum = 0;
-//        }
-//      }
-//    }else if(((esp_timer_get_time() - timervar)>3000000) && (wheelnum == 1) && (gateState == HIGH)){
-//      stopwatch = esp_timer_get_time() - timervar;
-//      myData.d = 0;
-//      myData.c = stopwatch;
-//      wheelnum = 0;
-//      senddata();
-//      
-//    }
-//  }
-//}
-
-
-//Select Button Debounce
 
 
 //Send Data

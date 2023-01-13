@@ -209,6 +209,8 @@ void updateDisplay(){
   display.clearDisplay();
   display.setTextSize(1);
   display.setTextColor(SSD1306_WHITE);
+  display.setCursor(25,0);
+  display.println("NU Motorsports");
   if(modeStatus == 0){
     updateDisplay_Gate();
   }else if(modeStatus == 1){
@@ -227,8 +229,6 @@ void updateDisplay(){
 
 //Screen Update Gate Num
 void updateDisplay_Gate(){
-  display.setCursor(25,0);
-  display.println("NU Motorsports");
   display.setCursor(0,18);
   display.print("Timing Gate ");
   display.print(gatenum);
@@ -237,8 +237,6 @@ void updateDisplay_Gate(){
 
 //Screen Update Broadcast Address
 void updateDisplay_Address(){
-  display.setCursor(25,0);
-  display.println("NU Motorsports");
   display.setCursor(13,18);
   display.println(WiFi.macAddress());
 }
@@ -246,8 +244,6 @@ void updateDisplay_Address(){
 
 //Screen Update Lock
 void updateDisplay_Lock(){
-  display.setCursor(25,0);
-  display.println("NU Motorsports");
   display.setCursor(30,18);
   display.println("Lock?");
 }

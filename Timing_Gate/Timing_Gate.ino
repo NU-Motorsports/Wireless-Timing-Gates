@@ -230,21 +230,24 @@ void updateDisplay(){
 //Screen Update Gate Num
 void updateDisplay_Gate(){
   display.setCursor(0,18);
-  display.print("Timing Gate ");
+  display.print("Timing Gate:");
+  display.setCursor(0,36);
   display.print(gatenum);
 }
 
 
 //Screen Update Broadcast Address
 void updateDisplay_Address(){
-  display.setCursor(13,18);
+  display.setCursor(0,18);
+  display.print("Broadcast Address:");
+  display.setCursor(0,36);
   display.println(WiFi.macAddress());
 }
 
 
 //Screen Update Lock
 void updateDisplay_Lock(){
-  display.setCursor(30,18);
+  display.setCursor(0,18);
   display.println("Lock?");
 }
 

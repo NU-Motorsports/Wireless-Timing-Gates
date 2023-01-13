@@ -18,11 +18,19 @@
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 //Inupt Pins
-const int button_pin = 23;
+const int modePin = 23;
 const int led_pin = 18;
 
 //Speed Calc Variables
-float wheelbase = 
+float wheelbase = 55.0;       //inches
+float speedValue =0;          //mph
+
+//Received Data Variables
+int gateReceived = 0;
+int speedTimeReceived = 0;
+bool speedStatusReceived = 0;
+
+
 bool buttonstate = 0;
 
 
@@ -40,6 +48,13 @@ struct_message myData;
 
 void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {  
   memcpy(&myData, incomingData, sizeof(myData));
+
+  gateReveived = myData.a;
+  speedTimeReceived = myData.c;
+  speedStatusReceived = myData.d;
+
+  speedValue = (wheelbase/speedTimeReceived)/56820;       //Speed value in mph
+  
   
   Serial.print(myData.a);     //Gate Number
   Serial.print("     ");
@@ -47,7 +62,9 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
   Serial.print("     ");
   Serial.print(myData.c);   //Speed (mph, will return 5 if less than 5mph
   Serial.print("     ");
-  Serial.println(myData.d);   //Speed (mph, will return 5 if less than 5mph
+  Serial.print(myData.d);   //Speed (mph, will return 5 if less than 5mph
+  Serial.print("    Speed: ");
+  Serial.println(speedValue);
   
   if(myData.b == 1){
     digitalWrite(led_pin, HIGH);
@@ -57,7 +74,7 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
 }
 
 void setup() {
-  pinMode(button_pin, INPUT);
+  pinMode(modePin, INPUT);
   pinMode(led_pin, OUTPUT);
   WiFi.mode(WIFI_MODE_STA);
   Serial.begin(9600);

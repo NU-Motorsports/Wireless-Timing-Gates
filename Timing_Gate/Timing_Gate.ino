@@ -156,12 +156,14 @@ void loop() {
   if((esp_timer_get_time()-lastButtonDebounceTime)>buttonDebounceDelay){
     if(modeReading != modeState){
       modeState = modeReading;
-      if(modeState == HIGH && modeStatus<num_modes){
-        modeStatus = modeStatus+1;
-        updateDisplay();
-      }else if(modeState == HIGH){
-        modeStatus = 0;
-        updateDisplay();
+      if(modeState == HIGH){
+        if(modeStatus<(num_modes-1)){
+          modeStatus = modeStatus+1;
+          updateDisplay();
+        }else{
+          modeStatus = 0;
+          updateDisplay();
+        }
       }
     }
   }

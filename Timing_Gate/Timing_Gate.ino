@@ -27,7 +27,7 @@ const int indicator_pin = 18;
 const int error_pin = 4;
 
 //Gate Variables
-int gatenum = 0;
+byte gatenum = 0;
 
 //Speed Detection Variables
 float timervar = 0;
@@ -55,13 +55,13 @@ bool lastSelectState = 0;
 uint8_t broadcastAddress[] = {0x78, 0x21, 0x84, 0x7F, 0xFC, 0x84};
 
 //Mode Variables
-int modeStatus = 0;   //0:Gate Number 1:Speed Display 2:Broadcast Address 3:Lock 4:Speed Measurement type?
-int num_modes = 3;
+byte modeStatus = 0;   //0:Gate Number 1:Speed Display 2:Broadcast Address 3:Lock 4:Speed Measurement type?
+byte num_modes = 3;
 
 
 //Data Structure
 typedef struct struct_message {
-  int a;                            //Gate Number (0-9)
+  byte a;                            //Gate Number (0-9)
   int b;                            //Speed trap time (in microseconds) if speed is less than ~1mph will return ~1mph worth of microseconds
   bool c;                           //Speed Trap measurement status (successful=1 unsucessful=0)
 } struct_message;

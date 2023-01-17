@@ -19,8 +19,8 @@
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 //Inupt Pins
-const int page_pin = 23;
-const int led_pin = 18;
+const byte page_pin = 23;
+const byte led_pin = 18;
 
 //Speed Calc Variables
 float wheelbase = 55.0;       //inches
@@ -28,7 +28,7 @@ float speedValue = 0;          //mph
 
 //Received Data Variables
 bool messageReceivedStatus = 0;
-int gateReceived = 0;
+byte gateReceived = 0;
 int speedTimeReceived = 0;
 bool speedStatusReceived = 0;
 
@@ -46,18 +46,18 @@ bool lastPageState = 0;
 bool pageState = 0;
 
 //Page Variables
-int pageStatus = 0;
+byte pageStatus = 0;
 //1: Recent Entry Overview
 //2: All Recent Sectors
 //3: Fastest Lap and Sectors
 //4: Top Speed
 //5: Broadcast Address
-int num_pages = 5;
+byte num_pages = 5;
 
 
 //Message Structure
 typedef struct struct_message {
-  int a;
+  byte a;
   int b;
   bool c;
 } struct_message;

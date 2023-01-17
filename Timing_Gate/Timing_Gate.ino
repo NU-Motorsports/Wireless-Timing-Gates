@@ -233,7 +233,17 @@ void updateDisplay_Gate(){
   display.setCursor(0,18);
   display.print("Timing Gate:");
   display.setCursor(0,36);
-  display.print(gatenum);
+  if(gatenum == 0){
+    display.print("Start Line");
+  }if(gatenum == 8){
+    display.print("Finish Line");
+  }if(gatenum == 9){
+    display.print("Start/Finish Line");
+  }else if(gatenum!=0 && gatenum!=8 && gatenum!=9){
+    display.print("Sector ");
+    display.print(gatenum);
+  }
+  
 }
 
 

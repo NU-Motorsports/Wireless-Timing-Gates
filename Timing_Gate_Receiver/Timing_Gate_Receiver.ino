@@ -19,7 +19,7 @@
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 //Inupt Pins
-const byte page_pin = 23;
+const byte page_pin = 15;
 const byte led_pin = 18;
 
 //Speed Calc Variables
@@ -51,7 +51,7 @@ byte pageStatus = 0;
 //2: All Recent Sectors
 //3: Fastest Lap and Sectors
 //4: Top Speed
-//5: Broadcast Address
+//5: Info Screen (MAC and Wheelbase)
 byte num_pages = 5;
 
 
@@ -155,17 +155,8 @@ void initScreen(){
   Serial.println(F("SSD1306 allocation failed"));
   for(;;); // Don't proceed, loop forever
   }
-  
-  display.clearDisplay();
-  display.setTextSize(1);
-  display.setTextColor(SSD1306_WHITE);
-  display.setCursor(25,0);
-  display.println(F("NU Motorsports"));
-  display.setCursor(0,18);
-  display.print("Device Address");
-  display.setCursor(0,36);
-  display.println(WiFi.macAddress());
-  display.display();
+
+  updateDisplay();
 }
 
 
@@ -174,27 +165,54 @@ void updateDisplay(){
   display.clearDisplay();
   display.setTextSize(1);
   display.setTextColor(SSD1306_WHITE);
+  display.setCursor(0,0);
+  display.println("NU Motorsports");
   if(pageStatus == 0){
+    updateDisplay_Trip();
+  }else if(pageStatus == 1){
+    updateDisplay_Sector();
+  }else if(pageStatus == 2){
+    updateDisplay_LapTime();
+  }else if (pageStatus == 3){
     updateDisplay_Info();
   }else{
-    display.setCursor(25,0);
-    display.println("NU Motorsports");
-    display.setCursor(0,18);
     display.print("Empty Mode Screen");
   }
   display.display();
 }
 
 
-//Screen Update Information
-void updateDisplay_Info(){
-  display.setCursor(25,0);
-  display.println("NU Motorsports");
-  display.setCursor(0,18);
-  display.print("Recent Information: ");
-  display.setCursor(0,36);
+//Screen Update Last Trip
+void updateDisplay_Trip(){
+  display.println("Last Gate Trip: ");
   display.print("Last Lap: ");
-  display.print(lastLapDuration);
+  display.println(lastLapDuration);
+  display.print("Last Speed: ");
+  display.println(speedValue);
+  display.print("Last Sector: ");
+  display.println("Empty");
+}
+
+
+//Screen Update Sector
+void updateDisplay_Sector(){
+  display.print("Last Sectors: ");
+}
+
+
+//Screen Update Sector
+void updateDisplay_LapTime(){
+  display.print("Last Lap: ");
+}
+
+
+//Screen Update Sector
+void updateDisplay_Info(){
+  display.println("Info: ");
+  display.print("MAC:");
+  display.println(WiFi.macAddress());
+  display.print("WB:");
+  display.println(wheelbase);
 }
 
 

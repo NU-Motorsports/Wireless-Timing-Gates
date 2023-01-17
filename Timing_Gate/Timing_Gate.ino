@@ -62,9 +62,8 @@ int num_modes = 3;
 //Data Structure
 typedef struct struct_message {
   int a;                            //Gate Number (0-9)
-  bool b;                           //Gate Status (tripped (1) vs not tripped (0))
-  int c;                            //Speed trap time (in microseconds) if speed is less than ~1mph will return ~1mph worth of microseconds
-  bool d;                           //Speed Trap measurement status (successful=1 unsucessful=0)
+  int b;                            //Speed trap time (in microseconds) if speed is less than ~1mph will return ~1mph worth of microseconds
+  bool c;                           //Speed Trap measurement status (successful=1 unsucessful=0)
 } struct_message;
 
 //Structured Object
@@ -134,14 +133,14 @@ void loop() {
           wheelnum = 1;
         }else if(wheelnum == 1){                                  //Record second gate hitting
           stopwatch = esp_timer_get_time() - timervar;
-          myData.d = 1;
+          myData.c = 1;
           senddata();
           wheelnum =0;
         }
       }
     }else if(((esp_timer_get_time() - timervar)>3000000) && (wheelnum == 1)){
         stopwatch = esp_timer_get_time() - timervar;
-        myData.d = 0;
+        myData.c = 0;
         senddata();
         wheelnum = 0;
       }
@@ -279,7 +278,8 @@ void inputread(){
 
 //Send Data
 void senddata(){
-  myData.c = stopwatch;
+  myData.a = gatenum;
+  myData.b = stopwatch;
   esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &myData, sizeof(myData));
     if(result == ESP_OK) {
       Serial.print("Sending Confirmed:    ");
@@ -287,9 +287,9 @@ void senddata(){
       Serial.print("    ");
       Serial.print(myData.b);
       Serial.print("    ");
-      Serial.print(myData.c);
+      Serial.print(myData.b);
       Serial.print("    ");
-      Serial.println(myData.d);
+      Serial.println(myData.c);
     } else  {
       Serial.println("Sending Error");
       digitalWrite(error_pin,HIGH);

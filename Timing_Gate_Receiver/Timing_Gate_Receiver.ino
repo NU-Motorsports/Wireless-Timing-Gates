@@ -58,9 +58,8 @@ int num_pages = 5;
 //Message Structure
 typedef struct struct_message {
   int a;
-  bool b;
-  int c;
-  bool d;
+  int b;
+  bool c;
 } struct_message;
 
 struct_message myData;
@@ -71,8 +70,8 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
   memcpy(&myData, incomingData, sizeof(myData));
 
   gateReceived = myData.a;
-  speedTimeReceived = myData.c;
-  speedStatusReceived = myData.d;
+  speedTimeReceived = myData.b;
+  speedStatusReceived = myData.c;
 
   messageReceivedStatus = 1;
 
@@ -106,14 +105,19 @@ void loop() {
   if(messageReceivedStatus == 1){
     if(gateReceived == 0){
       lapStartTime = esp_timer_get_time();
+      Serial.print("Message Received!    Lap Start Time: ");
+      Serial.println(lapStartTime);
+      
     }else if(gateReceived == 8){
       lastLapDuration = (esp_timer_get_time() - lapStartTime)/1000000.0;
+      Serial.print("Message Received with 8    Lap End time: ");
+      Serial.println(lastLapDuration);
     }else if(gateReceived == 9){
       lastLapDuration = (esp_timer_get_time() - lapStartTime)/1000000.0;
       lapStartTime = esp_timer_get_time();
     }
     messageReceivedStatus = 0;
-    Serial.println(lastLapDuration);
+    //Serial.println(lastLapDuration);
     updateDisplay();
   }
   
@@ -157,7 +161,9 @@ void initScreen(){
   display.setTextColor(SSD1306_WHITE);
   display.setCursor(25,0);
   display.println(F("NU Motorsports"));
-  display.setCursor(13,9);
+  display.setCursor(0,18);
+  display.print("Device Address");
+  display.setCursor(0,36);
   display.println(WiFi.macAddress());
   display.display();
 }
@@ -182,6 +188,8 @@ void updateDisplay(){
 
 //Screen Update Information
 void updateDisplay_Info(){
+  display.setCursor(25,0);
+  display.println("NU Motorsports");
   display.setCursor(0,18);
   display.print("Recent Information: ");
   display.setCursor(0,36);

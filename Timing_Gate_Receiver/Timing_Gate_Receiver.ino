@@ -57,9 +57,9 @@ byte num_pages = 5;
 
 //Message Structure
 typedef struct struct_message {
-  byte a;
-  int b;
-  bool c;
+  byte a;                           //Gate Number
+  int b;                            //Speed Trap Time (in microseconds) Will time out at 3s
+  bool c;                           //Speed Trap Measurement Status (successful = 1 unsuccessful = 0)
 } struct_message;
 
 struct_message myData;

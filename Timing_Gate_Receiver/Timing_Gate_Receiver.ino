@@ -82,6 +82,8 @@ void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
   
 }
 
+
+
 void setup() {
   pinMode(page_pin, INPUT);
   pinMode(led_pin, OUTPUT);
@@ -95,26 +97,23 @@ void setup() {
   esp_now_register_recv_cb(OnDataRecv);
 }
 
+
+
 void loop() {
   inputread();
 
-    speedValue = (wheelbase/speedTimeReceived)/56820;       //Speed value in mph
+    speedValue = (wheelbase/speedTimeReceived)*56820;       //Speed value in mph
   
 
   //On Data Received Actions
   if(messageReceivedStatus == 1){
     if(gateReceived == 0){
-      lapStartTime = esp_timer_get_time();
-      Serial.print("Message Received!    Lap Start Time: ");
-      Serial.println(lapStartTime);
-      
+      lapStartTime = esp_timer_get_time()-speedTimeReceived;
     }else if(gateReceived == 8){
-      lastLapDuration = (esp_timer_get_time() - lapStartTime)/1000000.0;
-      Serial.print("Message Received with 8    Lap End time: ");
-      Serial.println(lastLapDuration);
+      lastLapDuration = ((esp_timer_get_time()-speedTimeReceived) - lapStartTime)/1000000.0;
     }else if(gateReceived == 9){
-      lastLapDuration = (esp_timer_get_time() - lapStartTime)/1000000.0;
-      lapStartTime = esp_timer_get_time();
+      lastLapDuration = ((esp_timer_get_time()-speedTimeReceived) - lapStartTime)/1000000.0;
+      lapStartTime = esp_timer_get_time()-speedTimeReceived;
     }
     messageReceivedStatus = 0;
     //Serial.println(lastLapDuration);

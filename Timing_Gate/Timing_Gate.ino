@@ -20,11 +20,11 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 
 //I/O Pins
-const int gate_pin = 2;
-const int mode_pin = 23;
-const int select_pin = 19;
-const int indicator_pin = 18;
-const int error_pin = 4;
+const byte gate_pin = 2;
+const byte mode_pin = 23;
+const byte select_pin = 19;
+const byte indicator_pin = 18;
+const byte error_pin = 4;
 
 //Gate Variables
 byte gatenum = 0;

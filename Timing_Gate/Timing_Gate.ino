@@ -42,7 +42,7 @@ bool gateState = 0;
 bool lastGateState = 0;
 
 //Button Debounce Varbiables
-int buttonDebounceDelay = 16000;     //in microseconds
+int buttonDebounceDelay = 50000;     //in microseconds
 int lastButtonDebounceTime = 0;
 bool modeReading = 0;
 bool selectReading = 0;

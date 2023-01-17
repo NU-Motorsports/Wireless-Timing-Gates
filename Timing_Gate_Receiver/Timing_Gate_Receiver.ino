@@ -39,7 +39,7 @@ float fastestLapDuration = 0;
 
 //Button Debounce Variables
 bool buttonstate = 0;
-int buttonDebounceDelay = 16000;
+int buttonDebounceDelay = 50000;
 int lastButtonDebounceTime = 0;
 bool pageReading = 0;
 bool lastPageState = 0;

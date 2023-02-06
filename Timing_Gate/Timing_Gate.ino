@@ -20,11 +20,11 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 
 //I/O Pins
-const byte gate_pin = 2;
-const byte mode_pin = 23;
-const byte select_pin = 19;
-const byte indicator_pin = 18;
-const byte error_pin = 4;
+const byte gate_pin = 1;
+const byte page_pin = 3;
+const byte select_pin = 8;
+const byte indicator_pin = 7;
+const byte error_pin = 2;
 
 //Gate Variables
 byte gatenum = 0;
@@ -77,7 +77,7 @@ esp_now_peer_info_t peerInfo;
 void setup() {
   //Initial Setup
   pinMode(gate_pin, INPUT);
-  pinMode(mode_pin,INPUT);
+  pinMode(page_pin,INPUT);
   pinMode(select_pin,INPUT);
   pinMode(error_pin,OUTPUT);
   pinMode(indicator_pin, OUTPUT);
@@ -280,7 +280,7 @@ void initScreen(){
 //Read Inputs
 void inputread(){
   gateReading = digitalRead(gate_pin);
-  modeReading = digitalRead(mode_pin);
+  modeReading = digitalRead(page_pin);
   selectReading = digitalRead(select_pin);
 }
 

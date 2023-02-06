@@ -19,8 +19,8 @@
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 //Inupt Pins
-const byte page_pin = 15;
-const byte led_pin = 18;
+const byte page_pin = 3;
+const byte led_pin = 2;
 
 //Speed Calc Variables
 float wheelbase = 55.0;       //inches

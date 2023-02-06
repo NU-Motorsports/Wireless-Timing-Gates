@@ -10,6 +10,7 @@
 #include <esp_now.h>
 #include <esp_timer.h>
 #include <SD.h>
+#include <CAN.h>
 
 
 //Screen Setup
@@ -55,6 +56,9 @@ byte pageStatus = 0;
 //5: Info Screen (MAC and Wheelbase)
 byte num_pages = 5;
 
+//CAN Variables
+
+
 
 //Message Structure
 typedef struct struct_message {
@@ -89,6 +93,7 @@ void setup() {
   pinMode(page_pin, INPUT);
   pinMode(led_pin, OUTPUT);
   WiFi.mode(WIFI_MODE_STA);
+  CAN.setPins(18, 19);    //(rx, tx)
   Serial.begin(9600);
   initScreen();
   if  (esp_now_init() != ESP_OK)  {

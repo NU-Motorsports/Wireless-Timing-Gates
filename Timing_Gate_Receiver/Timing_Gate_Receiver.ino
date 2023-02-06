@@ -9,6 +9,7 @@
 #include <WiFi.h>
 #include <esp_now.h>
 #include <esp_timer.h>
+#include <SD.h>
 
 
 //Screen Setup

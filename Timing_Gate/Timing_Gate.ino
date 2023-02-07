@@ -20,14 +20,14 @@ Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 
 //I/O Pins
-const int gate_pin = 2;
-const int mode_pin = 23;
-const int select_pin = 19;
-const int indicator_pin = 18;
-const int error_pin = 4;
+const byte gate_pin = 1;
+const byte page_pin = 3;
+const byte select_pin = 8;
+const byte indicator_pin = 7;
+const byte error_pin = 2;
 
 //Gate Variables
-int gatenum = 0;
+byte gatenum = 0;
 
 //Speed Detection Variables
 float timervar = 0;
@@ -42,7 +42,7 @@ bool gateState = 0;
 bool lastGateState = 0;
 
 //Button Debounce Varbiables
-int buttonDebounceDelay = 16000;     //in microseconds
+int buttonDebounceDelay = 50000;     //in microseconds
 int lastButtonDebounceTime = 0;
 bool modeReading = 0;
 bool selectReading = 0;
@@ -55,16 +55,15 @@ bool lastSelectState = 0;
 uint8_t broadcastAddress[] = {0x78, 0x21, 0x84, 0x7F, 0xFC, 0x84};
 
 //Mode Variables
-int modeStatus = 0;   //0:Gate Number 1:Speed Display 2:Broadcast Address 3:Lock 4:Speed Measurement type?
-int num_modes = 3;
+byte modeStatus = 0;   //0:Gate Number 1:Speed Display 2:Broadcast Address 3:Lock 4:Speed Measurement type?
+byte num_modes = 3;
 
 
 //Data Structure
 typedef struct struct_message {
-  int a;                            //Gate Number (0-9)
-  bool b;                           //Gate Status (tripped (1) vs not tripped (0))
-  int c;                            //Speed trap time (in microseconds) if speed is less than ~1mph will return ~1mph worth of microseconds
-  bool d;                           //Speed Trap measurement status (successful=1 unsucessful=0)
+  byte a;                            //Gate Number (0-9)
+  int b;                            //Speed trap time (in microseconds) if speed is less than ~1mph will return ~1mph worth of microseconds
+  bool c;                           //Speed Trap measurement status (successful=1 unsucessful=0)
 } struct_message;
 
 //Structured Object
@@ -78,7 +77,7 @@ esp_now_peer_info_t peerInfo;
 void setup() {
   //Initial Setup
   pinMode(gate_pin, INPUT);
-  pinMode(mode_pin,INPUT);
+  pinMode(page_pin,INPUT);
   pinMode(select_pin,INPUT);
   pinMode(error_pin,OUTPUT);
   pinMode(indicator_pin, OUTPUT);
@@ -134,14 +133,14 @@ void loop() {
           wheelnum = 1;
         }else if(wheelnum == 1){                                  //Record second gate hitting
           stopwatch = esp_timer_get_time() - timervar;
-          myData.d = 1;
+          myData.c = 1;
           senddata();
           wheelnum =0;
         }
       }
     }else if(((esp_timer_get_time() - timervar)>3000000) && (wheelnum == 1)){
         stopwatch = esp_timer_get_time() - timervar;
-        myData.d = 0;
+        myData.c = 0;
         senddata();
         wheelnum = 0;
       }
@@ -234,7 +233,17 @@ void updateDisplay_Gate(){
   display.setCursor(0,18);
   display.print("Timing Gate:");
   display.setCursor(0,36);
-  display.print(gatenum);
+  if(gatenum == 0){
+    display.print("Start Line");
+  }if(gatenum == 8){
+    display.print("Finish Line");
+  }if(gatenum == 9){
+    display.print("Start/Finish Line");
+  }else if(gatenum!=0 && gatenum!=8 && gatenum!=9){
+    display.print("Sector ");
+    display.print(gatenum);
+  }
+  
 }
 
 
@@ -271,7 +280,7 @@ void initScreen(){
 //Read Inputs
 void inputread(){
   gateReading = digitalRead(gate_pin);
-  modeReading = digitalRead(mode_pin);
+  modeReading = digitalRead(page_pin);
   selectReading = digitalRead(select_pin);
 }
 
@@ -279,7 +288,8 @@ void inputread(){
 
 //Send Data
 void senddata(){
-  myData.c = stopwatch;
+  myData.a = gatenum;
+  myData.b = stopwatch;
   esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *) &myData, sizeof(myData));
     if(result == ESP_OK) {
       Serial.print("Sending Confirmed:    ");
@@ -287,9 +297,9 @@ void senddata(){
       Serial.print("    ");
       Serial.print(myData.b);
       Serial.print("    ");
-      Serial.print(myData.c);
+      Serial.print(myData.b);
       Serial.print("    ");
-      Serial.println(myData.d);
+      Serial.println(myData.c);
     } else  {
       Serial.println("Sending Error");
       digitalWrite(error_pin,HIGH);

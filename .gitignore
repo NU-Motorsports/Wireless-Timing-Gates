@@ -30,3 +30,8 @@
 *.exe
 *.out
 *.app
+
+#Arduino IDE
+*.svd
+*.json
+*.cfg

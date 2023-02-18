@@ -10,7 +10,7 @@
 #include <esp_now.h>
 #include <esp_timer.h>
 #include <SD.h>
-#include <CAN.h>
+
 
 
 //Screen Setup
@@ -21,7 +21,7 @@
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 //Inupt Pins
-const byte page_pin = 3;
+const byte page_pin = 15;
 const byte led_pin = 2;
 
 //Speed Calc Variables
@@ -93,8 +93,8 @@ void setup() {
   pinMode(page_pin, INPUT);
   pinMode(led_pin, OUTPUT);
   WiFi.mode(WIFI_MODE_STA);
-  CAN.setPins(18, 19);    //(rx, tx)
   Serial.begin(9600);
+  Wire.begin(21,22);
   initScreen();
   if  (esp_now_init() != ESP_OK)  {
     Serial.println("Error initializing ESP-NOW");

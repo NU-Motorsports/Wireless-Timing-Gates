@@ -87,7 +87,8 @@ void setup() {
   
   WiFi.mode(WIFI_MODE_STA);
   Serial.begin(9600);
-  
+
+  Wire.begin(4,5);
   
   //ESP-NOW Setup
   if (esp_now_init() != ESP_OK) {
@@ -272,7 +273,7 @@ void initScreen(){
     digitalWrite(error_pin,HIGH);
     //for(;;); // Don't proceed, loop forever
   }
-  
+  display.setRotation(2);
   updateDisplay();
 }
 

@@ -52,7 +52,7 @@ bool lastModeState = 0;
 bool lastSelectState = 0;
 
 //ESPNOW Variables
-uint8_t broadcastAddress[] = {0x78, 0x21, 0x84, 0x7F, 0xFC, 0x84};
+uint8_t broadcastAddress[] = {0x94, 0x3C, 0xC6, 0x33, 0xA5, 0x5C};
 
 //Mode Variables
 byte modeStatus = 0;   //0:Gate Number 1:Speed Display 2:Broadcast Address 3:Lock 4:Speed Measurement type?
